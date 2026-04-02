@@ -14,29 +14,30 @@ The agent:
 
 ---
 
-## ⚙️ Project Structure
 project-root/
 │
-├── inference.py # Runs the agent loop (ENTRY POINT)
-├── openenv.yaml # OpenEnv config
-├── Dockerfile # Deployment
-├── requirements.txt
+├── inference.py          # 🚀 Entry point (runs agent loop)
+├── openenv.yaml          # OpenEnv configuration
+├── Dockerfile            # Deployment setup
+├── requirements.txt      # Dependencies
 │
-├── env/ # Core environment logic
-│ ├── environment.py # reset() and step()
-│ ├── state.py # state structure
-│ ├── actions.py # action types
-│ ├── reward.py # reward logic
-│ ├── grader.py # final scoring
-│ └── tasks/ # easy / medium / hard cases
+├── env/                  # 🧠 Core Environment Logic
+│   ├── environment.py    # reset() and step()
+│   ├── state.py          # State structure
+│   ├── actions.py        # Action definitions
+│   ├── reward.py         # Reward function
+│   ├── grader.py         # Final scoring (0–1)
+│   │
+│   └── tasks/            # Problem cases
+│       ├── easy.py
+│       ├── medium.py
+│       └── hard.py
 │
-└── utils/
-├── prompt_builder.py
-├── action_parser.py
-
-
----
-
+├── utils/                # Helper utilities
+│   ├── prompt_builder.py # Builds LLM prompts
+│   └── action_parser.py  # Parses model output → action
+│
+└── README.md             # Project guide
 ## 🔄 How The System Works
 
 ### Step-by-step flow:
