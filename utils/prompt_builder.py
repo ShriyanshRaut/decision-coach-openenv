@@ -1,11 +1,42 @@
 def build_prompt(state):
+
+    step = state["step"]
+
+    # 🎯 STEP-AWARE INSTRUCTIONS (CRITICAL)
+    if step == 0:
+        instruction = "Ask ONE clear clarifying question about the user's problem."
+
+    elif step == 1:
+        instruction = "Ask ONE deeper clarifying question. Do NOT generate options."
+
+    elif step == 2:
+        instruction = (
+            "Generate 3-5 distinct options as a LIST. "
+            "Do NOT ask questions. Each option should be concise."
+        )
+
+    elif step == 3:
+        instruction = (
+        "Evaluate tradeoffs between the previously generated options. "
+        "You MUST compare options using pros, cons, risks, and benefits. "
+        "DO NOT generate new options. DO NOT ask questions. "
+        "ONLY analyze and compare."
+    )
+
+    else:
+        instruction = (
+            "Provide a final recommendation based on the previous reasoning. "
+            "Be specific and actionable."
+        )
+
     return f"""
 You are a decision-making AI agent.
 
 STRICT RULES:
-- You MUST reach a final decision within 5 steps
-- If enough information is available → give final_recommendation
-- DO NOT keep asking questions forever
+- Follow the instruction EXACTLY for the current step
+- Do NOT mix multiple actions
+- Do NOT ask questions unless explicitly told
+- Stay concise and structured
 
 Allowed types:
 ask_clarifying_question
@@ -13,14 +44,21 @@ generate_options
 evaluate_tradeoffs
 final_recommendation
 
-DO NOT use any other type.
+User Problem:
+{state['user_problem']}
 
-User Problem: {state['user_problem']}
-History: {state['conversation_history']}
+Conversation History:
+{state['conversation_history']}
 
-Respond ONLY in JSON:
+Current Step:
+{step}
+
+Instruction:
+{instruction}
+
+Respond ONLY in JSON format:
 {{
   "type": "...",
-  "content": "..."
+  "content": ...
 }}
 """
