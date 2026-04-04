@@ -29,14 +29,15 @@ def call_llm(prompt):
 
 
 # ✅ MAIN FUNCTION (IMPORTANT)
-def run_inference():
+def run_inference(user_problem: str):
     env = DecisionCoachEnv()
     state = env.reset()
 
+    # ✅ inject user input
+    state["user_problem"] = user_problem
+
     done = False
     max_steps = 5
-
-    logs = []  # store steps
 
     while not done and state["step"] < max_steps:
 
@@ -45,32 +46,36 @@ def run_inference():
         if state["step"] == max_steps - 1:
             action = {
                 "type": "final_recommendation",
-                "content": "Based on available information, this is the best decision."
+                "content": "Based on your situation, the best next step is to explore your options while building relevant skills and seeking guidance."
             }
-            logs.append("[FORCED FINAL STEP]")
         else:
             response = call_llm(prompt)
-            logs.append(f"RAW RESPONSE: {response}")
-
             action = parse_action(response)
 
         state, reward, done, _ = env.step(action)
 
-        logs.append(f"[STEP {state['step']}] {action['type']} | reward={reward}")
-
-    final_score = grade(state)
-    logs.append(f"[FINAL SCORE]: {final_score}")
-    logs.append("[END]")
+    # ✅ get full score breakdown (IMPORTANT)
+    scores = grade(state)   # now returns dict
 
     return {
-        "logs": logs,
-        "final_score": final_score,
-        "final_state": state
+        "conversation_history": state["conversation_history"],
+        "final_answer": state["final_answer"],
+        "scores": scores   # 🔥 not just final_score
     }
 
 
 # 👇 optional: still allow running directly
 if __name__ == "__main__":
-    result = run_inference()
-    for line in result["logs"]:
-        print(line)
+    test_input = "I am confused about my career path"
+
+    result = run_inference(test_input)
+
+    print("\n--- Conversation ---\n")
+    for step in result["conversation_history"]:
+        print(f"{step['type']} → {step['content']}")
+
+    print("\n--- Final Answer ---\n")
+    print(result["final_answer"])
+
+    print("\n--- Scores ---\n")
+    print(result["scores"])
