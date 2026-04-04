@@ -5,35 +5,48 @@ from utils.action_parser import parse_action
 from dotenv import load_dotenv
 load_dotenv()
 
-from openai import OpenAI
+import requests
 import os
 from env.grader import grade
 
-# 🔑 LLM client
-client = OpenAI(
-    base_url=os.getenv("API_BASE_URL"),
-    api_key=os.getenv("API_KEY")
-)
+# 🔑 HF TOKEN
+HF_TOKEN = os.getenv("HF_TOKEN")
 
-# 🤖 LLM call
+# 🤖 LLM call (HuggingFace)
 def call_llm(prompt):
-    response = client.chat.completions.create(
-        model="meta-llama/Meta-Llama-3-8B-Instruct",
-        messages=[
-            {"role": "system", "content": "You are a decision-making agent. Respond ONLY in JSON."},
+    url = "https://router.huggingface.co/v1/chat/completions"
+
+    headers = {
+        "Authorization": f"Bearer {HF_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "messages": [
+            {"role": "system", "content": "Respond ONLY in strict valid JSON."},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.7
-    )
-    return response.choices[0].message.content
+        "temperature": 0.3
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        result = response.json()
+
+        return result.get("choices", [{}])[0].get("message", {}).get("content", "{}")
+
+    except Exception as e:
+        print("LLM error:", e)
+        return "{}"  # safe fallback
 
 
-# ✅ MAIN FUNCTION (IMPORTANT)
+# ✅ MAIN FUNCTION
 def run_inference(user_problem: str):
     env = DecisionCoachEnv()
     state = env.reset()
 
-    # ✅ inject user input
+    # inject user input
     state["user_problem"] = user_problem
 
     done = False
@@ -46,7 +59,7 @@ def run_inference(user_problem: str):
         if state["step"] == max_steps - 1:
             action = {
                 "type": "final_recommendation",
-                "content": "Based on your situation, the best next step is to explore your options while building relevant skills and seeking guidance."
+                "content": "Start by exploring 1–2 concrete options this week, talk to someone in that field, and take a small actionable step."
             }
         else:
             response = call_llm(prompt)
@@ -54,17 +67,17 @@ def run_inference(user_problem: str):
 
         state, reward, done, _ = env.step(action)
 
-    # ✅ get full score breakdown (IMPORTANT)
-    scores = grade(state)   # now returns dict
+    # ✅ scoring
+    scores = grade(state)
 
     return {
         "conversation_history": state["conversation_history"],
         "final_answer": state["final_answer"],
-        "scores": scores   # 🔥 not just final_score
+        "scores": scores
     }
 
 
-# 👇 optional: still allow running directly
+# ✅ local test
 if __name__ == "__main__":
     test_input = "I am confused about my career path"
 
