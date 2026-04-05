@@ -45,6 +45,8 @@ STDOUT FORMAT
 import os
 from typing import List, Optional
 from openai import OpenAI
+from dotenv import load_dotenv
+load_dotenv()
 
 from env.environment import DecisionCoachEnv
 from utils.prompt_builder import build_prompt
@@ -54,7 +56,7 @@ from env.grader import grade
 # 🔑 ENV CONFIG
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "meta-llama/Meta-Llama-3-8B-Instruct")
-API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
+API_KEY = os.getenv("HF_TOKEN")
 
 TASK_NAME = "decision_task"
 BENCHMARK = "decision_coach_env"
@@ -65,14 +67,14 @@ TEMPERATURE = 0.3
 # 🔥 OpenAI-compatible client
 client = OpenAI(
     base_url=API_BASE_URL,
-    api_key=API_KEY or "hf_dummy_key"
+    api_key=API_KEY
 )
 
 
 # ================= LOGGING =================
 
 def log_start(task: str, env: str, model: str):
-    print(f"[START] task={task} env={env} model={model}", flush=True)
+      print(f"[START] task={task} env={env} model={model}", flush=True)
 
 
 def log_step(step: int, action: str, reward: float, done: bool, error: Optional[str]):
@@ -116,14 +118,27 @@ def run_inference(user_problem: str):
 
     done = False
 
-    while not done and state["step"] < 5:
+    while not done and state["step"] < MAX_STEPS:
         prompt = build_prompt(state)
-        response = call_llm(prompt)
-        action = parse_action(response)
+
+        # 🔥 FORCE FINAL STEP (CRITICAL)
+        if state["step"] >= 4:
+            action = {
+                "type": "final_recommendation",
+                "content": generate_final_answer(state)
+            }
+        else:
+            response = call_llm(prompt)
+            action = parse_action(response)
 
         state, _, done, _ = env.step(action)
 
-    return state
+    scores = grade(state)
+
+    return {
+        "state": state,
+        "scores": scores
+    }
 
 # ================= MAIN =================
 

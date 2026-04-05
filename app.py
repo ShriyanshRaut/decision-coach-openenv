@@ -27,10 +27,10 @@ def solve(problem):
     result = run_inference(problem)
 
     steps = ""
-    for step in result["conversation_history"]:
+    for step in result["state"]["conversation_history"]:
         steps += f"{step['type']}: {step['content']}\n\n"
 
-    final = result.get("final_answer", "")
+    final = result["state"].get("final_answer", "")
 
     return steps, final
 
