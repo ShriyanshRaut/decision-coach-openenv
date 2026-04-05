@@ -13,43 +13,30 @@ The agent:
 - gives a final recommendation
 
 ---
-
+```
 project-root/
 
 ├── inference.py
 │   # 🚀 Entry point (runs agent loop)
-
+│
 ├── openenv.yaml
 │   # OpenEnv configuration
-
+│
 ├── Dockerfile
 │   # Deployment setup
-
+│
 ├── requirements.txt
 │   # Dependencies
-
-
-├── env/
-│   # 🧠 Core Environment Logic
-
-│   ├── environment.py
-│   │   # reset() and step()
-
-│   ├── state.py
-│   │   # State structure
-
-│   ├── actions.py
-│   │   # Action definitions
-
-│   ├── reward.py
-│   │   # Reward function
-
-│   ├── grader.py
-│   │   # Final scoring (0–1)
-
-│   └── tasks/
-│       # Problem cases
-
+│
+│
+├── env/                            # 🧠 Core Environment Logic
+│   ├── environment.py              # reset() and step()
+│   ├── state.py                    # State structure
+│   ├── actions.py                  # Action definitions
+│   ├── reward.py                   # Reward function
+│   ├── grader.py                   # Final scoring (0–1)
+|   |
+│   └── tasks/                      # Problem cases
 │       ├── easy.py
 │       ├── medium.py
 │       └── hard.py
@@ -67,7 +54,7 @@ project-root/
 
 └── README.md
     # Project guide
-
+```
     
 ## 🔄 How The System Works
 
