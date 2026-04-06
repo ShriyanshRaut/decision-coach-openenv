@@ -91,8 +91,12 @@ class DecisionCoachEnv:
             reward = compute_reward(action, self.current_state)
         except:
             reward = 0
+          # 🔥 ADD THIS (efficiency penalty)
+            reward -= 0.05 * step           
 
         # 🛑 done condition
         done = (action_type == "final_recommendation") or (step >= 5)
+        
+        self.current_state["efficiency"] = 1 / step
 
         return self.current_state, reward, done, {}
