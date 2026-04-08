@@ -51,4 +51,4 @@ demo = gr.Interface(
 
 # ✅ RUN UI (not FastAPI server)
 if __name__ == "__main__":
-    demo.launch()
+    app = gr.mount_gradio_app(app, demo, path="/")
