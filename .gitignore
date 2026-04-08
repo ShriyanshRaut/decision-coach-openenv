@@ -1,4 +1,47 @@
-venv/
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.pyc.*
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment variables
 .env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Cache
+.cache/
+
+# Docker
+*.tar
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Hugging Face / tokens (IMPORTANT)
+hf_token.txt
