@@ -6,6 +6,10 @@ from inference import run_inference
 # ---------------- FASTAPI ---------------- #
 app = FastAPI()
 
+@app.post("/reset")
+def reset():
+    return {"status": "reset successful"}
+
 class DecisionRequest(BaseModel):
     user_problem: str
 
@@ -44,7 +48,6 @@ demo = gr.Interface(
     ],
     title="Decision Coach AI",
 )
-
 
 # ✅ RUN UI (not FastAPI server)
 if __name__ == "__main__":
