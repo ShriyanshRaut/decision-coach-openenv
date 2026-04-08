@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import gradio as gr
 from inference import run_inference
-
+import uvicorn
 # ---------------- FASTAPI ---------------- #
 app = FastAPI()
 
@@ -49,6 +49,11 @@ demo = gr.Interface(
     title="Decision Coach AI",
 )
 
-# ✅ RUN UI (not FastAPI server)
+
+# mount gradio (OUTSIDE)
+app = gr.mount_gradio_app(app, demo, path="/")
+
+# run server
 if __name__ == "__main__":
-    app = gr.mount_gradio_app(app, demo, path="/")
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=7860)
