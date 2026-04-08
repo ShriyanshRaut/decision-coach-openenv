@@ -1,0 +1,16 @@
+[project]
+name = "decision-coach-env"
+version = "0.1.0"
+description = "RL-style decision making environment"
+authors = [
+  { name="Shakti" }
+]
+dependencies = [
+  "openenv-core>=0.2.0"
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+[project.scripts]
+server = "server.app:main"

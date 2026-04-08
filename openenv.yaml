@@ -1,0 +1,18 @@
+name: decision-coach-env
+description: RL-style decision making environment
+
+entry_point: env.environment:DecisionCoachEnv
+
+tasks:
+  - id: easy_task
+    description: Simple binary decision
+  - id: medium_task
+    description: Multi-factor decision
+  - id: hard_task
+    description: Complex ambiguous decision
+
+observation_space:
+  type: object
+
+action_space:
+  type: object
