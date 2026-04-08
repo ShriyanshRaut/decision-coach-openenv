@@ -20,7 +20,7 @@ def llm_grade(state):
 
     final_answer = state.get("final_answer", "")
 
-    # 🔥 evaluation prompt
+    
     prompt = f"""
 You are a strict evaluator for an AI decision-making system.
 
@@ -59,7 +59,7 @@ IMPORTANT:
         response = requests.post(API_URL, headers=headers, json=payload)
         result = response.json()
 
-        # 🔥 HANDLE ALL HF RESPONSE FORMATS
+        
         if "choices" in result:
             text = result["choices"][0]["message"]["content"]
         elif "generated_text" in result:
@@ -70,7 +70,7 @@ IMPORTANT:
             print("Unknown HF response:", result)
             return 0.5
 
-        # 🔥 SAFE PARSE
+        
         try:
             score = float(text.strip().split()[0])
         except:

@@ -53,7 +53,7 @@ from utils.prompt_builder import build_prompt
 from utils.action_parser import parse_action
 from env.grader import grade
 
-# 🔑 ENV CONFIG
+
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "meta-llama/Meta-Llama-3-8B-Instruct")
 API_KEY = os.getenv("HF_TOKEN")
@@ -64,14 +64,14 @@ BENCHMARK = "decision_coach_env"
 MAX_STEPS = 5
 TEMPERATURE = 0.3
 
-# 🔥 OpenAI-compatible client
+
 client = OpenAI(
     base_url=API_BASE_URL,
     api_key=API_KEY
 )
 
 
-# ================= LOGGING =================
+
 
 def log_start(task: str, env: str, model: str):
       print(f"[START] task={task} env={env} model={model}", flush=True)
@@ -93,7 +93,7 @@ def log_end(success: bool, steps: int, score: float, rewards: List[float]):
     )
 
 
-# ================= LLM CALL =================
+
 
 def call_llm(prompt: str) -> str:
     try:
@@ -136,7 +136,7 @@ def run_inference(user_problem: str):
     while not done and state["step"] < MAX_STEPS:
         prompt = build_prompt(state)
 
-        # 🔥 FORCE FINAL STEP (CRITICAL)
+
         if state["step"] >= 4:
             action = {
                 "type": "final_recommendation",
@@ -155,7 +155,7 @@ def run_inference(user_problem: str):
         "scores": scores
     }
 
-# ================= MAIN =================
+
 
 def main():
 
@@ -196,7 +196,7 @@ def main():
                 error=None
             )
 
-        # ✅ scoring
+
         scores = grade(state)
         score = scores.get("final_score", 0.0)
 
@@ -217,7 +217,7 @@ def generate_final_answer(state):
     if not options:
         return "Based on your situation, choose one direction and take a small step this week to reduce uncertainty."
 
-    # pick first 1–2 options and make it actionable
+
     selected = options[:2]
 
     answer = "Based on your situation, here’s a practical way forward:\n\n"

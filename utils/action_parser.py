@@ -10,11 +10,11 @@ VALID_TYPES = [
 
 def parse_action(response_text):
     try:
-        # ✅ Ensure string (fixes list/dict error)
+        
         if not isinstance(response_text, str):
             response_text = json.dumps(response_text)
 
-        # ✅ Extract JSON safely (non-greedy)
+        
         match = re.search(r'\{.*?\}', response_text, re.DOTALL)
 
         if not match:
@@ -22,10 +22,10 @@ def parse_action(response_text):
 
         action = json.loads(match.group())
 
-        # ✅ Validate type
+        
         if action.get("type") not in VALID_TYPES:
            action["type"] = "generate_options"
-        # ✅ Validate content
+        
         content = action.get("content", "")
 
         action["content"] = content
@@ -35,7 +35,7 @@ def parse_action(response_text):
     except Exception as e:
         print("Parse error:", e)
 
-        # 🚨 Always-safe fallback
+        
         return {
             "type": "ask_clarifying_question",
             "content": "Can you describe a specific issue you're facing instead of general confusion?"

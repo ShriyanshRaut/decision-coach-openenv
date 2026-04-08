@@ -2,7 +2,7 @@ def build_prompt(state):
 
     step = state["step"]
 
-    # 🎯 STEP-AWARE INSTRUCTIONS
+    
     if step == 0:
          instruction = (
             "The problem is clear. DO NOT ask questions. "

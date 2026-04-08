@@ -17,7 +17,7 @@ for task in ALL_TASKS:
 
     print(f"Score: {scores['final_score']}")
 
-# ✅ overall average
+
 avg_score = sum(r["score"] for r in results) / len(results)
 
 print("\n======================")
