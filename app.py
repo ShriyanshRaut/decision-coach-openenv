@@ -13,9 +13,6 @@ def reset():
 class DecisionRequest(BaseModel):
     user_problem: str
 
-@app.get("/")
-def home():
-    return {"message": "API is running"}
 
 @app.post("/decision")
 def decision(request: DecisionRequest):
