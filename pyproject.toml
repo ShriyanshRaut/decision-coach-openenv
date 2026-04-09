@@ -8,7 +8,7 @@ authors = [
 dependencies = []
 
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools", "wheel","pip"]
 build-backend = "setuptools.build_meta"
 [project.scripts]
 server = "server.app:main"
