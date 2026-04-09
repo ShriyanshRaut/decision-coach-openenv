@@ -1,7 +1,6 @@
 [project]
 name = "decision-coach-env"
 version = "0.1.0"
-description = "RL-style decision making environment"
 authors = [
   { name="Shakti" }
 ]
