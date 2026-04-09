@@ -5,9 +5,7 @@ description = "RL-style decision making environment"
 authors = [
   { name="Shakti" }
 ]
-dependencies = [
-  "openenv-core>=0.2.0"
-]
+dependencies = []
 
 [build-system]
 requires = ["setuptools", "wheel"]
