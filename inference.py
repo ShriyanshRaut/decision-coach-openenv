@@ -44,7 +44,7 @@ STDOUT FORMAT
 
 import os
 from typing import List, Optional
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -59,8 +59,10 @@ API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "meta-llama/Meta-Llama-3-8B-Instruct")
 API_KEY = os.getenv("HF_TOKEN")
 
-openai.api_key = API_KEY
-openai.api_base = API_BASE_URL
+client = OpenAI(
+    base_url=API_BASE_URL,
+    api_key=API_KEY
+)
 
 MAX_STEPS = 5
 TEMPERATURE = 0.3
@@ -103,7 +105,7 @@ RULES:
 Respond ONLY in valid JSON.
 """
 
-        completion = openai.ChatCompletion.create(
+        completion = client.chat.completions.create(
             model=MODEL_NAME,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
@@ -112,7 +114,7 @@ Respond ONLY in valid JSON.
             temperature=TEMPERATURE,
         )
 
-        return completion["choices"][0]["message"]["content"].strip()
+        return (completion.choices[0].message.content or "").strip()
 
     except Exception as e:
         print(f"[DEBUG] LLM error: {e}", flush=True)
