@@ -46,6 +46,7 @@ import os
 from typing import List, Optional
 from openai import OpenAI
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from env.environment import DecisionCoachEnv
@@ -53,29 +54,23 @@ from utils.prompt_builder import build_prompt
 from utils.action_parser import parse_action
 from env.grader import grade
 
-
+# ENV CONFIG
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "meta-llama/Meta-Llama-3-8B-Instruct")
 API_KEY = os.getenv("HF_TOKEN")
 
-TASK_NAME = "decision_task"
-BENCHMARK = "decision_coach_env"
-
 MAX_STEPS = 5
 TEMPERATURE = 0.3
-
 
 client = OpenAI(
     base_url=API_BASE_URL,
     api_key=API_KEY
 )
 
-
-
+# ---------------- LOGGING ----------------
 
 def log_start(task: str, env: str, model: str):
-      print(f"[START] task={task} env={env} model={model}", flush=True)
-
+    print(f"[START] task={task} env={env} model={model}", flush=True)
 
 def log_step(step: int, action: str, reward: float, done: bool, error: Optional[str]):
     error_val = error if error else "null"
@@ -84,7 +79,6 @@ def log_step(step: int, action: str, reward: float, done: bool, error: Optional[
         flush=True,
     )
 
-
 def log_end(success: bool, steps: int, score: float, rewards: List[float]):
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
     print(
@@ -92,8 +86,7 @@ def log_end(success: bool, steps: int, score: float, rewards: List[float]):
         flush=True,
     )
 
-
-
+# ---------------- LLM CALL ----------------
 
 def call_llm(prompt: str) -> str:
     try:
@@ -127,6 +120,8 @@ Respond ONLY in valid JSON.
         print(f"[DEBUG] LLM error: {e}", flush=True)
         return "{}"
 
+# ---------------- INFERENCE ----------------
+
 def run_inference(user_problem: str):
     env = DecisionCoachEnv()
     state = env.reset(user_problem)
@@ -135,7 +130,6 @@ def run_inference(user_problem: str):
 
     while not done and state["step"] < MAX_STEPS:
         prompt = build_prompt(state)
-
 
         if state["step"] >= 4:
             action = {
@@ -155,17 +149,16 @@ def run_inference(user_problem: str):
         "scores": scores
     }
 
-
+# ---------------- MAIN LOOP ----------------
 
 def main():
-
     env = DecisionCoachEnv()
     state = env.reset("I am confused about my career")
 
     rewards = []
     steps_taken = 0
 
-    log_start(task=TASK_NAME, env=BENCHMARK, model=MODEL_NAME)
+    log_start(task="decision_task", env="decision_coach_env", model=MODEL_NAME)
 
     done = False
 
@@ -175,10 +168,10 @@ def main():
             prompt = build_prompt(state)
 
             if state["step"] >= 4:
-             action = {
-        "type": "final_recommendation",
-        "content": generate_final_answer(state)
-    }
+                action = {
+                    "type": "final_recommendation",
+                    "content": generate_final_answer(state)
+                }
             else:
                 response = call_llm(prompt)
                 action = parse_action(response)
@@ -196,10 +189,8 @@ def main():
                 error=None
             )
 
-
         scores = grade(state)
         score = scores.get("final_score", 0.0)
-
         success = score >= 0.6
 
     except Exception as e:
@@ -210,13 +201,13 @@ def main():
     finally:
         log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
 
+# ---------------- FINAL ANSWER ----------------
 
 def generate_final_answer(state):
     options = state.get("options", [])
 
     if not options:
-        return "Based on your situation, choose one direction and take a small step this week to reduce uncertainty."
-
+        return "Based on your situation, take one small step this week to reduce uncertainty."
 
     selected = options[:2]
 
@@ -228,6 +219,7 @@ def generate_final_answer(state):
     answer += "\nStart with one option this week and take a small actionable step to test it."
 
     return answer
+
 
 if __name__ == "__main__":
     main()
